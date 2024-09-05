@@ -106,8 +106,11 @@ class GeneratorPage:
     @allure.step("Проверка изменения числа 'До'")
     def check_input_number_changed(self):
         """ Проверка того, что введенное число 'До' изменилось."""
-        self.logger.info("Проверка изменения числа 'До'")
-        number = self.method.get_element_text(self.RESULT_RANGE)
+        self.logger.info("Проверка того, что введенное число 'До' изменилось")
+
+        # Получение текста блока результата
+        result_text = self.method.get_element_text(self.RESULT_RANGE)
+        self.logger.info(f"Текст блока результата: {result_text}")
 
         patterns = {
             'min': r'Min:\s*(\d+)',
@@ -116,20 +119,33 @@ class GeneratorPage:
 
         matches = {}
         for name, pattern in patterns.items():
-            match = re.search(pattern, number)
+            match = re.search(pattern, result_text)
             if match:
                 matches[name] = int(match.group(1))
+                self.logger.info(f"Найдено значение {name}: {matches[name]}")
+            else:
+                self.logger.warning(f"Не найдено значение {name} в тексте результата")
 
         if len(matches) == 2:
             extracted_min, extracted_max = matches['min'], matches['max']
+            self.logger.info(f"Извлеченные значения: Min={extracted_min}, Max={extracted_max}")
+
+            # Проверка изменения числа
+            assert extracted_max == extracted_min + 1, f"Измененное значение ({extracted_max}) не на 1 больше введенного {extracted_min}"
+            self.logger.info("Проверка изменения числа пройдена успешно")
+
             yield extracted_min, extracted_max
         else:
+            self.logger.error("Не удалось найти оба значения (Min и Max) в блоке результата")
             yield None
 
     @allure.step("Извлечение значений из блока результата...")
     def extract_result_values(self):
         """ Извлечение значений 'Min' и 'Max' из блока результата """
-        number = self.method.get_element_text(self.RESULT_RANGE)
+        self.logger.info("Извлечение значений 'Min' и 'Max' из блока результата")
+
+        result_text = self.method.get_element_text(self.RESULT_RANGE)
+        self.logger.info(f"Текст блока результата: {result_text}")
 
         patterns = {
             'min': r'Min:\s*(\d+)',
@@ -138,14 +154,22 @@ class GeneratorPage:
 
         matches = {}
         for name, pattern in patterns.items():
-            match = re.search(pattern, number)
+            match = re.search(pattern, result_text)
             if match:
                 matches[name] = int(match.group(1))
+                self.logger.info(f"Найдено значение {name}: {matches[name]}")
+            else:
+                self.logger.warning(f"Не найдено значение {name} в тексте результата")
 
         return matches['min'], matches['max']
 
     @allure.step("Проверка изменения числа 'До'...")
     def verify_number_change(self):
         """ Проверка того, что введенное число 'До' изменилось."""
+        self.logger.info("Начало проверки изменения числа 'До'")
+
         min_value, max_value = self.extract_result_values()
-        assert max_value == min_value + 1, f"Измененное значение ({max_value}) должно быть на 1 больше введенного {min_value}"
+        self.logger.info(f"Извлеченные значения: Min={min_value}, Max={max_value}")
+
+        assert max_value == min_value + 1, f"Измененное значение ({max_value}) не на 1 больше введенного {min_value}"
+        self.logger.info("Проверка изменения числа пройдена успешно")

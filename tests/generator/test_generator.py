@@ -1,6 +1,5 @@
 from pages.generator_page import GeneratorPage
 import pytest
-import os
 
 
 class TestGenerateValues:
