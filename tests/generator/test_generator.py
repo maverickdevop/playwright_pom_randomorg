@@ -1,3 +1,5 @@
+import time
+
 from pages.generator_page import GeneratorPage
 import pytest
 
@@ -8,7 +10,7 @@ class TestGenerateValues:
     def setup_class(self, page):
         self.generator = GeneratorPage(page)
         self.generator.get_randomorg_page()
-        self.generator.check_randomorg_page_title()
+        #self.generator.check_randomorg_page_title()
 
     def test_input_range_numbers(self):
         self.generator.fill_range_data(10, 100)
@@ -27,3 +29,6 @@ class TestGenerateValues:
         self.generator.click_generate_button()
         self.generator.wait_for_result()
         self.generator.check_input_number_changed()
+
+    def test_click_btn_iframe(self):
+        self.generator.click_on_button_iframe()

@@ -47,6 +47,9 @@ def context(browser):
     """Фикстура для создания нового контекста браузера с куками."""
     context = browser.new_context(
         java_script_enabled=True,
+        # Чтобы запруфать, что куки работают поменять URL, раскомментить запись видео
+        # record_video_dir="tests/videos",
+        # record_video_size={"width": 1200, "height": 700}
     )
     cookies = [
         {
