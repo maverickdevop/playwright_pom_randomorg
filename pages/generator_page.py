@@ -1,23 +1,22 @@
 from playwright.sync_api import Page
 from pages.base_methods import BaseMethods
 import allure
-import logging
+import re
 
 
 class GeneratorPage:
 
     MAIN_PAGE_URL = 'https://www.random.org/widgets/integers/iframe'
     TITLE = "RANDOM.ORG - Integer Widget"
-    MIN_INPUT = "//input[contains(@id, 'min')]"
-    MAX_INPUT = "//input[contains(@id, 'max')]"
+    MIN_INPUT = "//input[contains(@id,'min')]"
+    MAX_INPUT = "//input[contains(@id,'max')]"
     GENERATE_BUTTON = "//input[@value='Generate']"
-    RESULT = "//span[contains(@id, 'result')]"
-    RESULT_NUM = "//span[contains(@id, 'result')]//span"
+    RESULT = "//span[contains(@id,'result')]"
+    RESULT_NUM = "//span[contains(@id,'result')]//span"
     RESULT_RANGE = "//center[span[contains(text(), 'Min') and contains(text(), 'Max')]][normalize-space(.)]"
 
     def __init__(self, page: Page):
         self.method = BaseMethods(page)
-        self.logger = logging.getLogger(__name__)
 
     @allure.step("Переход на главную страницу Random.org")
     def get_randomorg_page(self):
@@ -37,9 +36,9 @@ class GeneratorPage:
     @allure.step("Получение результата генерации")
     def _check_input_values(self):
         """ Внутренний метод проверки результата """
-        self.logger.info("Получение результата генерации")
         try:
             result = self.method.get_element_number(self.RESULT_NUM)
+            print("Результат сгенерированного значения:", result)
             yield result
         except Exception as e:
             raise AssertionError(f"Не удалось получить результат: {str(e)}")
@@ -79,21 +78,21 @@ class GeneratorPage:
         """ Проверка полученного числа с ожидаемым
         :param expected_num: Ожидаемое целочисленное значение.
         """
-        self.logger.info(f"Проверка ожидаемого результата: {expected_num}")
         # Проверка на положительное число
         if not isinstance(expected_num, int) or expected_num <= 0:
             raise ValueError(f"Ожидаемое число {expected_num} должно быть положительным целым числом.")
 
         actual_num = next(self._check_input_values())
 
-        assert expected_num == actual_num, f"Полученное число {actual_num} не равно ожидаемому {expected_num}"
+        assert expected_num == actual_num, \
+            f"Полученное число {actual_num} не равно ожидаемому {expected_num}"
 
     @allure.step("Проверка результата в диапозоне списка значений: {expected_num}")
     def get_result_number_and_assert_with_expected_range(self, expected_num: list):
         """ Проверка полученного числа с диапазоном значений
         :param expected_num: Ожидаемый список целочисленных значений.
         """
-        self.logger.info(f"Проверка результата в диапозоне: {expected_num}")
+
         # Проверка на положительные числа в диапозоне
         if not all(isinstance(num, int) and num > 0 for num in expected_num):
             raise ValueError(f"В списке {expected_num} должны быть только положительные целые числа!")
@@ -101,20 +100,19 @@ class GeneratorPage:
         min_value, max_value = map(int, expected_num)
         actual_num = next(self._check_input_values())
 
-        assert min_value <= actual_num <= max_value, f"Полученное число {actual_num} не входит в диапазон от {min_value} до {max_value}"
+        assert min_value <= actual_num <= max_value, \
+            f"Полученное число {actual_num} не входит в диапазон от {min_value} до {max_value}"
 
     @allure.step("Проверка изменения числа 'До'")
     def check_input_number_changed(self):
         """ Проверка того, что введенное число 'До' изменилось."""
-        self.logger.info("Проверка того, что введенное число 'До' изменилось")
 
         # Получение текста блока результата
         result_text = self.method.get_element_text(self.RESULT_RANGE)
-        self.logger.info(f"Текст блока результата: {result_text}")
 
         patterns = {
-            'min': r'Min:\s*(\d+)',
-            'max': r'Max:\s*(\d+)'
+           'min': r'Min:\s*(\d+)',
+           'max': r'Max:\s*(\d+)'
         }
 
         matches = {}
@@ -122,54 +120,20 @@ class GeneratorPage:
             match = re.search(pattern, result_text)
             if match:
                 matches[name] = int(match.group(1))
-                self.logger.info(f"Найдено значение {name}: {matches[name]}")
             else:
-                self.logger.warning(f"Не найдено значение {name} в тексте результата")
+                print(f"Не найдено значение {name} в тексте результата")
 
         if len(matches) == 2:
             extracted_min, extracted_max = matches['min'], matches['max']
-            self.logger.info(f"Извлеченные значения: Min={extracted_min}, Max={extracted_max}")
 
             # Проверка изменения числа
-            assert extracted_max == extracted_min + 1, f"Измененное значение ({extracted_max}) не на 1 больше введенного {extracted_min}"
-            self.logger.info("Проверка изменения числа пройдена успешно")
+            assert extracted_max == extracted_min + 1, \
+                f"Измененное значение ({extracted_max}) не на 1 больше введенного {extracted_min}"
 
-            yield extracted_min, extracted_max
+            actual_num = next(self._check_input_values())
+
+            assert actual_num in [extracted_min, extracted_max], \
+                f"Полученное рандомное значение ({actual_num}) не в диапозоне {[extracted_min, extracted_max]}"
+
         else:
-            self.logger.error("Не удалось найти оба значения (Min и Max) в блоке результата")
-            yield None
-
-    @allure.step("Извлечение значений из блока результата...")
-    def extract_result_values(self):
-        """ Извлечение значений 'Min' и 'Max' из блока результата """
-        self.logger.info("Извлечение значений 'Min' и 'Max' из блока результата")
-
-        result_text = self.method.get_element_text(self.RESULT_RANGE)
-        self.logger.info(f"Текст блока результата: {result_text}")
-
-        patterns = {
-            'min': r'Min:\s*(\d+)',
-            'max': r'Max:\s*(\d+)'
-        }
-
-        matches = {}
-        for name, pattern in patterns.items():
-            match = re.search(pattern, result_text)
-            if match:
-                matches[name] = int(match.group(1))
-                self.logger.info(f"Найдено значение {name}: {matches[name]}")
-            else:
-                self.logger.warning(f"Не найдено значение {name} в тексте результата")
-
-        return matches['min'], matches['max']
-
-    @allure.step("Проверка изменения числа 'До'...")
-    def verify_number_change(self):
-        """ Проверка того, что введенное число 'До' изменилось."""
-        self.logger.info("Начало проверки изменения числа 'До'")
-
-        min_value, max_value = self.extract_result_values()
-        self.logger.info(f"Извлеченные значения: Min={min_value}, Max={max_value}")
-
-        assert max_value == min_value + 1, f"Измененное значение ({max_value}) не на 1 больше введенного {min_value}"
-        self.logger.info("Проверка изменения числа пройдена успешно")
+            print("Не удалось найти оба значения (Min и Max) в блоке результата")

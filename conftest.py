@@ -22,7 +22,7 @@ def browser_type(request):
 def browser_type_launch_args(request):
     """Фикстура для настройки параметров запуска браузера."""
     launch_args = {
-        "headless": False,
+        "headless": True,
     }
     return launch_args
 

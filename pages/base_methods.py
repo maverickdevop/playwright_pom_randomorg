@@ -1,5 +1,4 @@
 from allure import step
-from playwright.sync_api import FrameLocator
 
 
 class BaseMethods:
