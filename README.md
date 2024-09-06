@@ -15,7 +15,8 @@
 Версия Python `Python 3.8 и выше` рекомендуется `Python 3.12` актуальноть можно проверить командой:
 
 ```bash
-python -v
+python --version
+python -V
 ```
 
 Установить актуальную версию можно тут: https://www.python.org/downloads/
