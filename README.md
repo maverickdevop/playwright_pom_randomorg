@@ -4,17 +4,20 @@
 Для параметризации был использован подход Page Object Model (POM) для простоты распределения базовых методов и page для каждого типа тестов
 
 Проект содержит набор UI тестов. Тесты разработаны для работы с различными моудлями и страницами проекта SEOWORK.
-Используется паттерн Page Object Model (POM) - Каждый тест хранится в отдельном `page`, повторяющиеся методы стараемся выносить в отдельный метод с его тестовым классом.
-Сами тесты лежат в папке `tests`
+Используется паттерн `Page Object Model (POM)` - Каждый тест хранится в отдельном `page`, повторяющиеся методы стараемся выносить в отдельный метод с его тестовым классом.
+
+Сами тесты лежат в `tests` в отдельной папке `generator`
 
 ## Системные требовнаия
 
 Для корректной работы рекомендуется использовать OS: `MacOS Sonoma 14.5 и выше / Linux Ubuntu 20 и выше`
 На остальных операционных системах запуски и корректность работы не тестировалась
 Версия Python `Python 3.8 и выше` рекомендуется `Python 3.12` актуальноть можно проверить командой:
+
 ```bash
-    python -v
+python -v
 ```
+
 Установить актуальную версию можно тут: https://www.python.org/downloads/
 
 Также все остальные пакеты, как `PyTest`, `Playwright` и т.д. можно из файла `requirements.txt`
@@ -22,6 +25,20 @@
 
 Для работы с кодом рекомендуется скачать IDE `PyCharm`
 Бесплатная версия программы доступна на сайте JetBrains (Для примера ссылка на выгрузку CE версии MacOS ARM): https://www.jetbrains.com/pycharm/download/download-thanks.html?platform=macM1&code=PCC
+
+Дополнительно нужно установить Docker
+
+1. Перейдите на официальный сайт Docker по этой ссылке: https://www.docker.com/products/docker-desktop/.
+2. Нажмите кнопку Download for Mac. Docker Desktop доступен для macOS с чипами Intel и Apple Silicon (M1/M2) (Или другая ОС).
+3. Проверьте установку Docker
+```bash
+docker --version
+```
+Если установка прошла успешно, вы увидите версию Docker, например:
+```
+Docker version 24.0.5, build 123abc
+```
+
 
 ## Установка
 
@@ -92,6 +109,8 @@ git clone https://github.com/maverickdevop/playwright_pom_randomorg.git
 ```bash
 docker pull wenzelsmirnov95/randomorg:latest
 ```
+
+Или по прямой ссылке: https://hub.docker.com/r/wenzelsmirnov95/randomorg
 
 Также локально создать образ и запустить собранный образ в контейнере Docker
 ```bash
