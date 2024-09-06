@@ -117,3 +117,13 @@ docker pull wenzelsmirnov95/randomorg:latest
 docker build -t randomorg .
 docker run randomorg
 ```
+
+## Скриншоты запусков тестов
+Запуск тестов локально:
+<img width="1800" alt="Снимок экрана 2024-09-06 в 14 20 17" src="https://github.com/user-attachments/assets/5d6733f5-65ee-47a9-8700-6b1890c48aa8">
+
+Создание образа Docker и запуск тестов в Docker контейнере:
+<img width="1800" alt="Снимок экрана 2024-09-06 в 14 38 15" src="https://github.com/user-attachments/assets/7b0e180a-0a49-4300-a444-6b50a5733fa5">
+<img width="1800" alt="Снимок экрана 2024-09-06 в 14 38 32" src="https://github.com/user-attachments/assets/057ebc6c-4e5b-490f-bc50-44632c4a8d14">
+
+
